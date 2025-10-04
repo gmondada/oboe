@@ -3,11 +3,11 @@ import Foundation
 struct git {
     static func getRemoteTags(repoUrl: String) -> [String: String] {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         task.arguments = ["git", "ls-remote", "--tags", repoUrl]
         let pipe = Pipe()
         task.standardOutput = pipe
-        task.launch()
+        try! task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let text = String(data: data, encoding: .utf8)!
         // parse tag list
@@ -36,38 +36,38 @@ struct git {
 
     static func removeLocalTags() {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         task.arguments = ["git", "tag", "-l"]
         let pipe = Pipe()
         task.standardOutput = pipe
-        task.launch()
+        try! task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let text = String(data: data, encoding: .utf8)!
         let tags = text.split(separator: "\n").map { String($0) }
         for tag in tags {
             let deleteTask = Process()
-            deleteTask.launchPath = "/usr/bin/env"
+            deleteTask.executableURL = URL(fileURLWithPath: "/usr/bin/env")
             deleteTask.arguments = ["git", "tag", "-d", tag]
-            deleteTask.launch()
+            try! deleteTask.run()
             deleteTask.waitUntilExit()
         }
     }
 
     static func addTag(name: String, hash: String) {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         task.arguments = ["git", "tag", name, hash]
-        task.launch()
+        try! task.run()
         task.waitUntilExit()
     }
 
     static func getCommits() -> [String: String] {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         task.arguments = ["git", "log", "--all", "--pretty=format:%H\t%s"]
         let pipe = Pipe()
         task.standardOutput = pipe
-        task.launch()
+        try! task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let text = String(data: data, encoding: .utf8)!
         let lines = text.split(separator: "\n")

@@ -45,9 +45,9 @@ func createCMakeQueries(buildUrl: URL) {
 
     try! FileManager.default.createDirectory(at: queryDir, withIntermediateDirectories: true)
     let codemodelFile = queryDir.appendingPathComponent("codemodel-v2")
-    FileManager.default.createFile(atPath: codemodelFile.path, contents: nil)
+    _ = FileManager.default.createFile(atPath: codemodelFile.path, contents: nil)
     let toolchainsFile = queryDir.appendingPathComponent("toolchains-v1")
-    FileManager.default.createFile(atPath: toolchainsFile.path, contents: nil)
+    _ = FileManager.default.createFile(atPath: toolchainsFile.path, contents: nil)
 }
 
 func searchCommand(_ command: String) -> URL? {
