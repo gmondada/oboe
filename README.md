@@ -1,4 +1,16 @@
-# Oboe [![Build CI](https://github.com/google/oboe/workflows/Build%20CI/badge.svg)](https://github.com/google/oboe/actions)
+# Oboe as a Swift Package
+
+## ⚠️ Important
+
+This package exposes a copy of the official Oboe repository as a Swift Package.
+
+This is **not** a Swift wrapper for Oboe. If you want to use Oboe directly from Swift, please see [swift-oboe](https://github.com/gmondada/swift-oboe).
+
+While it may seem unusual to provide a Swift Package containing only C++ code, this approach offers a simple and powerful way to include the library in a Swift project.  
+
+This package is intended to be used on **Android only**.
+
+---
 
 [![Introduction to Oboe video](docs/images/getting-started-video.jpg)](https://www.youtube.com/watch?v=csfHAbr5ilI&list=PLWz5rJ2EKKc_duWv9IPNvx9YBudNMmLSa)
 
