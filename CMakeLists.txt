@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 4.0.0)
+
+#cmake_file_api(
+#  QUERY
+#  API_VERSION 1
+#  CODEMODEL 2.3
+#  TOOLCHAINS 1
+#)
 
 # Set the name of the project and store it in PROJECT_NAME. Also set the following variables:
 # PROJECT_SOURCE_DIR (usually the root directory where Oboe has been cloned e.g.)
@@ -108,3 +115,48 @@ install(TARGETS oboe
 
 # Also install the headers
 install(DIRECTORY include/oboe DESTINATION include)
+
+
+get_target_property(srcs oboe SOURCES)
+message(STATUS "Sources for oboe: ${srcs}")
+
+get_target_property(incs oboe INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "Include directories for oboe: ${incs}")
+
+get_target_property(incs2 oboe INCLUDE_DIRECTORIES)
+message(STATUS "Include directories for oboe: ${incs2}")
+
+# Print all CMake variables in JSON format
+file(WRITE "${CMAKE_BINARY_DIR}/cmake_vars.json" "{\n")
+get_cmake_property(_variableNames VARIABLES)
+list(APPEND _variableNames SOURCES)
+list(APPEND _variableNames INTERFACE_INCLUDE_DIRECTORIES)
+list(APPEND _variableNames INCLUDE_DIRECTORIES)
+list(LENGTH _variableNames _varCount)
+set(_varIndex 0)
+foreach(_variableName ${_variableNames})
+        # Escape quotes and backslashes for JSON
+        string(REPLACE "\\" "\\\\" _value "${${_variableName}}")
+        string(REPLACE "\"" "\\\"" _value "${_value}")
+        string(REPLACE "\n" "\\n" _value "${_value}")
+        # Print variable as JSON key-value pair
+        file(APPEND "${CMAKE_BINARY_DIR}/cmake_vars.json" "  \"${_variableName}\": \"${_value}\"")
+        math(EXPR _varIndex "${_varIndex} + 1")
+        if(NOT _varIndex EQUAL _varCount)
+                file(APPEND "${CMAKE_BINARY_DIR}/cmake_vars.json" ",\n")
+        else()
+                file(APPEND "${CMAKE_BINARY_DIR}/cmake_vars.json" "\n")
+        endif()
+endforeach()
+file(APPEND "${CMAKE_BINARY_DIR}/cmake_vars.json" "}\n")
+message(STATUS "CMake variables written to ${CMAKE_BINARY_DIR}/cmake_vars.json")
+
+# List all properties for the 'oboe' target
+get_target_property(_all_properties oboe VARIABLES)
+message(STATUS "All properties for target 'oboe': ${_all_properties}")
+
+# Print all target properties and their values
+foreach(_prop ${_all_properties})
+        get_target_property(_prop_value oboe ${_prop})
+        message(STATUS "Target property '${_prop}': ${_prop_value}")
+endforeach()
