@@ -34,23 +34,34 @@ struct git {
         return tags
     }
 
-    static func removeLocalTags() {
+    static func getTags() -> [String: String] {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        task.arguments = ["git", "tag", "-l"]
+        task.arguments = ["git", "show-ref", "--tags"]
         let pipe = Pipe()
         task.standardOutput = pipe
         try! task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let text = String(data: data, encoding: .utf8)!
-        let tags = text.split(separator: "\n").map { String($0) }
-        for tag in tags {
-            let deleteTask = Process()
-            deleteTask.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-            deleteTask.arguments = ["git", "tag", "-d", tag]
-            try! deleteTask.run()
-            deleteTask.waitUntilExit()
+        let lines = text.split(separator: "\n")
+        var tags: [String: String] = [:]
+        for line in lines {
+            let components = line.split(separator: " ")
+            if components.count == 2 {
+                let hash = String(components[0])
+                let name = String(components[1]).replacingOccurrences(of: "refs/tags/", with: "")
+                tags[name] = hash
+            }
         }
+        return tags
+    }
+
+    static func removeTag(name: String) {
+        let deleteTask = Process()
+        deleteTask.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+        deleteTask.arguments = ["git", "tag", "-d", name]
+        try! deleteTask.run()
+        deleteTask.waitUntilExit()
     }
 
     static func addTag(name: String, hash: String) {

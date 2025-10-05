@@ -15,21 +15,27 @@ if CommandLine.argc >= 2 && CommandLine.arguments[1] == "cmake2spm" {
     buildOboe(projectUrl: projectUrl, abi: "arm64-v8a")
 } else if CommandLine.argc >= 2 && CommandLine.arguments[1] == "tags" {
     let originalTags = git.getRemoteTags(repoUrl: "https://github.com/google/oboe.git")
-    git.removeLocalTags()
+    let tags = git.getTags()
+    for (name, _) in tags {
+        if !name.hasPrefix("spm-") {
+            git.removeTag(name: name)
+        }
+    }
+
     for (name, hash) in originalTags {
         print("Adding tag 'original-\(name)'")
         git.addTag(name: "original-" + name, hash: hash)
     }
-    let commits = git.getCommits()
-    for (hash, message) in commits {
-        if let match = message.firstMatch(of: /@tag\s+([0-9\.]+)/) {
-            let tag = String(match.1)
-            print("Extract tag \(tag) from commit \(hash)")
-            git.addTag(name: tag, hash: hash)
+
+    for (name, hash) in tags {
+        if name.hasPrefix("spm-") {
+            let version = String(name.dropFirst(4))
+            print("Adding tag '\(version)'")
+            git.addTag(name: version, hash: hash)
         }
     }
 } else {
     print("Usage:")
     print("  dev cmake2spm        build the Swift Package from the CMake project")
-    print("  dev tags             clean all git tags and rebuild them from annotations in the commit messages")
+    print("  dev tags             refresh all version tags")
 }
